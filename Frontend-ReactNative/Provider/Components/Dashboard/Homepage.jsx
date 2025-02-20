@@ -12,6 +12,7 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function HomePage({ navigation }) {
   const [shopLocation] = useState("Hinjewadi, Pune");
@@ -47,6 +48,17 @@ export default function HomePage({ navigation }) {
     setEditItem(item);
     setNewMenu(item);
     setShowModal(true);
+  };
+  const handleLogout = async () => {
+    try {
+      // Remove the token from AsyncStorage
+      await AsyncStorage.removeItem("jwtToken");
+
+      // Redirect the user to the login screen
+      navigation.replace("GoLogin");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
   const handleSaveItem = () => {
@@ -97,10 +109,7 @@ export default function HomePage({ navigation }) {
 
       {/* Bottom Navigation */}
       <View style={styles.bottomTabContainer}>
-        <TouchableOpacity
-          style={styles.tabButton}
-          onPress={() => navigation.navigate("Home")}
-        >
+        <TouchableOpacity style={styles.tabButton} onPress={handleLogout}>
           <Text style={styles.tabText}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity

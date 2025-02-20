@@ -1,0 +1,118 @@
+CREATE TABLE pune_areas (
+    area_id INT PRIMARY KEY AUTO_INCREMENT,
+    area_name VARCHAR(100) NOT NULL UNIQUE,
+    pincode VARCHAR(10) NOT NULL UNIQUE
+);
+
+INSERT INTO pune_areas (area_name, pincode)
+VALUES ('Shivajinagar', '411005'),
+       ('Kothrud', '411038'),
+       ('Hinjewadi', '411057'),
+       ('Koregaon Park', '411001');
+
+
+CREATE TABLE admin (
+    admin_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE provider (
+    provider_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    phone VARCHAR(20) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE agent (
+    agent_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    phone VARCHAR(20) NOT NULL UNIQUE,
+    current_lat DECIMAL(10,8) DEFAULT NULL,
+    current_long DECIMAL(11,8) DEFAULT NULL,
+    available BOOLEAN NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE customer (
+    customer_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    phone VARCHAR(20) NOT NULL UNIQUE,
+    location_lat DECIMAL(10,8) DEFAULT NULL,
+    location_long DECIMAL(11,8) DEFAULT NULL,
+    area_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (area_id) REFERENCES pune_areas(area_id) ON DELETE SET NULL
+);
+
+CREATE TABLE menu (
+    menu_id INT PRIMARY KEY AUTO_INCREMENT,
+    provider_id INT NOT NULL,
+    item_name VARCHAR(100) NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    available BOOLEAN NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (provider_id) REFERENCES provider(provider_id) ON DELETE CASCADE
+);
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id INT NOT NULL,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    order_status ENUM('Pending', 'Confirmed', 'Delivered', 'Cancelled') NOT NULL DEFAULT 'Pending',
+    delivery_lat DECIMAL(10,8) DEFAULT NULL,
+    delivery_long DECIMAL(11,8) DEFAULT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE
+);
+
+CREATE TABLE item (
+    item_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    menu_id INT NOT NULL,
+    quantity INT NOT NULL CHECK (quantity > 0),
+    price DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (menu_id) REFERENCES menu(menu_id) ON DELETE CASCADE
+);
+
+CREATE TABLE delivery (
+    delivery_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    agent_id INT NOT NULL,
+    delivery_status ENUM('Assigned', 'In Transit', 'Delivered', 'Failed') NOT NULL DEFAULT 'Assigned',
+    current_lat DECIMAL(10,8) DEFAULT NULL,
+    current_long DECIMAL(11,8) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (agent_id) REFERENCES agent(agent_id) ON DELETE CASCADE
+);
+
+CREATE TABLE payment (
+    payment_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    payment_status ENUM('Pending', 'Completed', 'Failed') NOT NULL DEFAULT 'Pending',
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    payment_method ENUM('Credit Card', 'Debit Card', 'UPI', 'Net Banking', 'Cash') NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
+);
+
+CREATE TABLE subscription (
+    subscription_id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id INT NOT NULL,
+    subscription_type ENUM('Daily', 'Weekly', 'Monthly') NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    status ENUM('Active', 'Expired', 'Cancelled') NOT NULL DEFAULT 'Active',
+    FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE
+);

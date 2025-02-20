@@ -1,0 +1,478 @@
+Create Admin
+
+Method: POST
+URL: http://localhost:3000/admin
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "username": "adminUser ",
+  "password": "adminPass"
+}
+Get All Admins
+
+Method: GET
+URL: http://localhost:3000/admin
+Get Admin by ID
+
+Method: GET
+URL: http://localhost:3000/admin/{id}
+Update Admin
+
+Method: PUT
+URL: http://localhost:3000/admin/{id}
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "username": "updatedUser ",
+  "password": "newPass"
+}
+Delete Admin
+
+Method: DELETE
+URL: http://localhost:3000/admin/{id}
+
+
+Create Customer
+
+Method: POST
+URL: http://localhost:3000/customer
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "address": "123 Main St",
+  "phone": "1234567890",
+  "location_lat": "12.345678",
+  "location_long": "98.765432"
+}
+Get All Customers
+
+Method: GET
+URL: http://localhost:3000/customer
+Get Customer by ID
+
+Method: GET
+URL: http://localhost:3000/customer/{id}
+Update Customer
+
+Method: PUT
+URL: http://localhost:3000/customer/{id}
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "password": "newpassword",
+  "address": "456 Elm St",
+  "phone": "0987654321",
+  "location_lat": "12.345678",
+  "location_long": "98.765432"
+}
+Delete Customer
+
+Method: DELETE
+URL: http://localhost:3000/customer/{id}
+
+
+Provider API
+Create Provider
+
+Method: POST
+URL: http://localhost:3000/provider
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "name": "Provider Name",
+  "address": "Provider Address",
+  "phone": "1234567890",
+  "email": "provider@example.com"
+}
+Get All Providers
+
+Method: GET
+URL: http://localhost:3000/provider
+Get Provider by ID
+
+Method: GET
+URL: http://localhost:3000/provider/{id}
+Update Provider
+
+Method: PUT
+URL: http://localhost:3000/provider/{id}
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "name": "Updated Provider",
+  "address": "Updated Address",
+  "phone": "0987654321",
+  "email": "updated@example.com"
+}
+Delete Provider
+
+Method: DELETE
+URL: http://localhost:3000/provider/{id}
+
+
+Create Order
+
+Method: POST
+URL: http://localhost:3000/order
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{  
+  "customerId": "123",  
+  "providerId": "456",  
+  "items": [  
+    {  
+      "productId": "789",  
+      "quantity": 2  
+    }  
+  ],  
+  "totalAmount": 100.00  
+}  
+Get All Orders
+
+Method: GET
+URL: http://localhost:3000/order
+Get Order by ID
+
+Method: GET
+URL: http://localhost:3000/order/{id}
+Update Order
+
+Method: PUT
+URL: http://localhost:3000/order/{id}
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{  
+  "status": "shipped",  
+  "trackingNumber": "TRACK123"  
+}  
+Delete Order
+
+Method: DELETE
+URL: http://localhost:3000/order/{id}
+
+
+1. Payment API
+Create Payment
+
+Method: POST
+URL: http://localhost:3000/payment
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "order_id": 1,
+  "amount": 100.00,
+  "payment_status": "completed",
+  "payment_date": "2023-10-01",
+  "payment_method": "credit_card"
+}
+Get All Payments
+
+Method: GET
+URL: http://localhost:3000/payment
+Get Payment by ID
+
+Method: GET
+URL: http://localhost:3000/payment/{id}
+Update Payment
+
+Method: PUT
+URL: http://localhost:3000/payment/{id}
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "order_id": 1,
+  "amount": 150.00,
+  "payment_status": "pending",
+  "payment_date": "2023-10-02",
+  "payment_method": "paypal"
+}
+Delete Payment
+
+Method: DELETE
+URL: http://localhost:3000/payment/{id}
+2. Menu API
+Create Menu Item
+
+Method: POST
+URL: http://localhost:3000/menu
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "provider_id": 1,
+  "item_name": "Pizza",
+  "price": 12.99,
+  "is_available": true
+}
+Get All Menu Items
+
+Method: GET
+URL: http://localhost:3000/menu
+Get Menu Item by ID
+
+Method: GET
+URL: http://localhost:3000/menu/{id}
+Update Menu Item
+
+Method: PUT
+URL: http://localhost:3000/menu/{id}
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "provider_id": 1,
+  "item_name": "Updated Pizza",
+  "price": 14.99,
+  "is_available": false
+}
+Delete Menu Item
+
+Method: DELETE
+URL: http://localhost:3000/menu/{id}
+3. Item API
+Create Item
+
+Method: POST
+URL: http://localhost:3000/item
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "order_id": 1,
+  "menu_id": 1,
+  "quantity": 2,
+  "price": 25.98
+}
+Get All Items
+
+Method: GET
+URL: http://localhost:3000/item
+Get Item by ID
+
+Method: GET
+URL: http://localhost:3000/item/{id}
+Update Item
+
+Method: PUT
+URL: http://localhost:3000/item/{id}
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "order_id": 1,
+  "menu_id": 1,
+  "quantity": 3,
+  "price": 38.97
+}
+Delete Item
+
+Method: DELETE
+URL: http://localhost:3000/item/{id}
+4. Feedback API
+Create Feedback
+
+Method: POST
+URL: http://localhost:3000/feedback
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "order_id": 1,
+  "customer_id": 1,
+  "rating": 5,
+  "comments": "Great service!"
+}
+Get All Feedbacks
+
+Method: GET
+URL: http://localhost:3000/feedback
+Get Feedback by ID
+
+Method: GET
+URL: http://localhost:3000/feedback/{id}
+Update Feedback
+
+Method: PUT
+URL: http://localhost:3000/feedback/{id}
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "rating": 4,
+  "comments": "Good service, but could be faster."
+}
+Delete Feedback
+
+Method: DELETE
+URL: http://localhost:3000/feedback/{id}
+5. Delivery API
+Create Delivery
+
+Method: POST
+URL: http://localhost:3000/delivery
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "order_id": 1,
+  "delivery_address": "123 Main St",
+  "delivery_status": "in_progress",
+  "delivery_time": "2023-10-01T12:00:00Z"
+}
+Get All Deliveries
+
+Method: GET
+URL: http://localhost:3000/delivery
+Get Delivery by ID
+
+Method: GET
+URL: http://localhost:3000/delivery/{id}
+Update Delivery
+
+Method: PUT
+URL: http://localhost:3000/delivery/{id}
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "delivery_status": "delivered",
+  "delivery_time": "2023-10-01T12:30:00Z"
+}
+Delete Delivery
+
+Method: DELETE
+URL: http://localhost:3000/delivery/{id}
+6. Agent API
+Create Delivery Agent
+
+Method: POST
+URL: http://localhost:3000/agent
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "name": "John Doe",
+  "phone": "1234567890",
+  "vehicle": "Bike"
+}
+Get All Agents
+
+Method: GET
+URL: http://localhost:3000/agent
+Get Agent by ID
+
+Method: GET
+URL: http://localhost:3000/agent/{id}
+Update Agent
+
+Method: PUT
+URL: http://localhost:3000/agent/{id}
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "name": "Jane Doe",
+  "phone": "0987654321",
+  "vehicle": "Car"
+}
+Delete Agent
+
+Method: DELETE
+URL: http://localhost:3000/agent/{id}
+7. Subscription API
+Create Subscription
+
+Method: POST
+URL: http://localhost:3000/subscription
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "customer_id": 1,
+  "subscription_type": "monthly",
+  "start_date": "2023-10-01",
+  "end_date": "2023-10-31"
+}
+Get All Subscriptions
+
+Method: GET
+URL: http://localhost:3000/subscription
+Get Subscription by ID
+
+Method: GET
+URL: http://localhost:3000/subscription/{id}
+Update Subscription
+
+Method: PUT
+URL: http://localhost:3000/subscription/{id}
+Body (JSON):
+json
+Insert Code
+Run
+Copy code
+{
+  "subscription_type": "yearly",
+  "start_date": "2023-10-01",
+  "end_date": "2024-10-01"
+}
+Delete Subscription
+
+Method: DELETE
+URL: http://localhost:3000/subscription/{id}

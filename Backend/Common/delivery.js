@@ -3,6 +3,18 @@ const express = require('express');
 const router = express.Router();
 const db = require('./db'); // Import the common database connection
 
+// Get all cities
+// delivery.js
+router.get('/cities', (req, res) => {
+    const sql = 'SELECT * FROM locations'; // or the correct table/logic to fetch cities
+    db.query(sql, (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json(rows); // This should return an array of cities
+    });
+  });
+
 // Create a new delivery
 router.post('/', (req, res) => {
     const { order_id, agent_id, delivery_status, current_lat, current_long } = req.body;
