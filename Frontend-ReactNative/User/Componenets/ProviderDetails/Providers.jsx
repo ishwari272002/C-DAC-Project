@@ -1,204 +1,285 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
+  ActivityIndicator,
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  Image,
 } from "react-native";
-import { useRoute, useNavigation } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { Card } from "react-native-paper";
+import API_BASE_URL from "../../../config";
 
 const ProviderDetails = () => {
-  const route = useRoute();
   const navigation = useNavigation();
-  const { provider } = route.params;
+  const route = useRoute();
+  const { providerId } = route.params;
 
-  // Initialize menu with quantity and price
-  const [menu, setMenu] = useState(
-    provider.menu.map((item) => ({
-      ...item,
-      quantity: 0,
-      totalPrice: 0,
-    }))
-  );
+  const [provider, setProvider] = useState(null);
+  const [menuItems, setMenuItems] = useState([]);
+  const [cart, setCart] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  // Handle quantity changes and calculate the total price
-  const handleQuantityChange = (index, change) => {
-    const updatedMenu = [...menu];
-    const updatedItem = { ...updatedMenu[index] };
+  useEffect(() => {
+    fetchProviderDetails();
+    fetchMenuItems();
+  }, []);
 
-    updatedItem.quantity = updatedItem.quantity + change;
-
-    if (updatedItem.quantity < 0) updatedItem.quantity = 0; // Prevent negative quantity
-    updatedItem.totalPrice = updatedItem.quantity * updatedItem.price; // Calculate total price
-    updatedMenu[index] = updatedItem;
-
-    setMenu(updatedMenu);
-  };
-
-  // Handle adding items to cart (only items with quantity > 0)
-  const handleAddToCart = () => {
-    const selectedItems = menu.filter((item) => item.quantity > 0); // Filter items with quantity > 0
-
-    if (selectedItems.length > 0) {
-      navigation.navigate("cart", { cartItems: selectedItems });
+  const fetchProviderDetails = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/provider/${providerId}`);
+      if (!response.ok) throw new Error("Failed to fetch provider details");
+      const data = await response.json();
+      setProvider(data);
+    } catch (error) {
+      console.error("Error fetching provider details:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Display the total price for all selected items
-  const getTotalPrice = () => {
-    return menu.reduce((acc, item) => acc + item.totalPrice, 0);
+  const fetchMenuItems = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/menu/list/${providerId}`);
+      if (!response.ok) throw new Error("Failed to fetch menu items");
+      const data = await response.json();
+      setMenuItems(data);
+    } catch (error) {
+      console.error("Error fetching menu items:", error);
+    }
   };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{provider.name} - Menu</Text>
-      <FlatList
-        data={menu}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View style={styles.menuItem}>
-            <Text style={styles.menuItemText}>{item.name}</Text>
-            <Text style={styles.description}>Description of {item.name}</Text>
-            <Text style={styles.price}>Price: ₹{item.price}</Text>
-            <View style={styles.quantityContainer}>
-              <TouchableOpacity
-                onPress={() => handleQuantityChange(index, -1)}
-                style={styles.button}
-              >
-                <Text style={styles.buttonText}>-</Text>
-              </TouchableOpacity>
-              <Text style={styles.quantity}>{item.quantity}</Text>
-              <TouchableOpacity
-                onPress={() => handleQuantityChange(index, 1)}
-                style={styles.button}
-              >
-                <Text style={styles.buttonText}>+</Text>
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity
-              onPress={() => handleAddToCart()}
-              style={styles.addToCartButton}
-            >
-              <Text style={styles.addToCartText}>Add to Cart</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
+  const addToCart = (item) => {
+    setCart((prevCart) => ({
+      ...prevCart,
+      [item.menu_id]: prevCart[item.menu_id]
+        ? {
+            ...prevCart[item.menu_id],
+            quantity: prevCart[item.menu_id].quantity + 1,
+          }
+        : { ...item, quantity: 1 },
+    }));
+  };
 
-      {/* Display total price and 'Go to Cart' button if any items are added */}
-      {getTotalPrice() > 0 && (
-        <View style={styles.cartFooter}>
-          <Text style={styles.totalPriceText}>Total: ₹{getTotalPrice()}</Text>
-          <TouchableOpacity
-            onPress={handleAddToCart} // Go to cart with selected items
-            style={styles.goToCartButton}
-          >
-            <Text style={styles.goToCartText}>Go to Cart</Text>
-          </TouchableOpacity>
-        </View>
+  const incrementQuantity = (menu_id) => {
+    setCart((prevCart) => ({
+      ...prevCart,
+      [menu_id]: {
+        ...prevCart[menu_id],
+        quantity: prevCart[menu_id].quantity + 1,
+      },
+    }));
+  };
+
+  const decrementQuantity = (menu_id) => {
+    setCart((prevCart) => {
+      if (prevCart[menu_id].quantity === 1) {
+        const newCart = { ...prevCart };
+        delete newCart[menu_id];
+        return newCart;
+      }
+      return {
+        ...prevCart,
+        [menu_id]: {
+          ...prevCart[menu_id],
+          quantity: prevCart[menu_id].quantity - 1,
+        },
+      };
+    });
+  };
+
+  const goToCart = () => {
+    navigation.navigate("cart", { cartItems: Object.values(cart), providerId });
+};
+
+  const renderStars = (rating) => {
+    const filledStars = Math.floor(rating);
+    const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+    const emptyStars = 5 - filledStars - halfStar;
+
+    return (
+      <View style={styles.ratingContainer}>
+        {[...Array(filledStars)].map((_, index) => (
+          <Icon key={`full-${index}`} name="star" size={14} color="gold" />
+        ))}
+        {halfStar === 1 && <Icon name="star-half" size={14} color="gold" />}
+        {[...Array(emptyStars)].map((_, index) => (
+          <Icon key={`empty-${index}`} name="star-o" size={14} color="gold" />
+        ))}
+        <Text style={styles.ratingText}>({rating})</Text>
+      </View>
+    );
+  };
+
+  if (loading) {
+    return (
+      <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />
+    );
+  }
+
+  if (!provider) {
+    return <Text style={styles.errorText}>Provider details not found.</Text>;
+  }
+
+  return (
+
+    <View style={styles.container}>
+      <View style={styles.card1}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Text style={styles.providerName}>{provider.name} </Text>
+        
+        {renderStars(provider.rating)}
+      </View>
+
+      <Text style={styles.providerLocation}>📍{provider.address}</Text>
+
+      <Text style={styles.description}>Contact-us: {provider.phone}</Text>
+     
+      </View>
+
+      <Text style={styles.menuHeading}>Menu Items</Text>
+
+      {menuItems.length === 0 ? (
+        <Text style={styles.noMenuText}>No menu available.</Text>
+      ) : (
+        <FlatList
+          data={menuItems}
+          keyExtractor={(item) => item.menu_id.toString()}
+          renderItem={({ item }) => (
+            <Card style={styles.card}>
+              <View style={styles.cardContent}>
+                <Image
+                  source={{ uri: item.image_url }}
+                  style={styles.cardImage}
+                />
+                <View style={styles.cardDetails}>
+                  <Text style={styles.menuItemName}>{item.item_name}</Text>
+                  <Text style={styles.menuItemPrice}>₹{item.price}</Text>
+                  {renderStars(item.rating)}
+                  <Text style={styles.menuItemDescription}>
+                    {item.description}
+                  </Text>
+
+                  {cart[item.menu_id] ? (
+                    <View style={styles.quantityContainer}>
+                      <TouchableOpacity
+                        onPress={() => decrementQuantity(item.menu_id)}
+                        style={styles.qtyButton}
+                      >
+                        <Text style={styles.qtyText}>-</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.qtyNumber}>
+                        {cart[item.menu_id].quantity}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => incrementQuantity(item.menu_id)}
+                        style={styles.qtyButton}
+                      >
+                        <Text style={styles.qtyText}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => addToCart(item)}
+                      style={styles.addButton}
+                    >
+                      <Text style={styles.addButtonText}>Add to Cart</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            </Card>
+          )}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        />
+      )}
+
+      {Object.keys(cart).length > 0 && (
+        <TouchableOpacity onPress={goToCart} style={styles.cartButton}>
+          <Text style={styles.cartButtonText}>
+            Go to Cart ({Object.keys(cart).length})
+          </Text>
+        </TouchableOpacity>
       )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFEBEE", // Light orange background
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#FF5722", // Orange color for title
-  },
-  menuItem: {
-    backgroundColor: "#FFFFFF",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 8,
+  card1: {
+    backgroundColor: "#FFFFFF", // Neutral White background
+    borderRadius: 12,
     shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 5,
+    shadowRadius: 5,
+    elevation: 3,
+    marginBottom: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#BDDBDB", // Light Gray border
   },
-  menuItemText: {
-    fontSize: 18,
-    fontWeight: "500",
-    color: "#333333",
+  container: { flex: 1, backgroundColor: "#FFF5E1", padding: 16 },
+  loader: { flex: 1, justifyContent: "center", alignItems: "center" },
+  providerName: { fontSize: 22, fontWeight: "bold" },
+  providerLocation: { fontSize: 16, color: "#666", marginBottom: 10 },
+  description: { fontSize: 14, color: "#444", marginBottom: 20 },
+  menuHeading: { fontSize: 20, fontWeight: "bold", marginBottom: 15 },
+  noMenuText: { fontSize: 16, color: "gray", textAlign: "center" },
+
+  // Card Styles
+  card: {
+    backgroundColor: "#fff",
+    marginVertical: 5,
+    borderRadius: 10,
+    overflow: "hidden",
+    elevation: 3,
   },
-  description: {
-    fontSize: 14,
-    color: "#666",
-    marginVertical: 8,
+  cardContent: { flexDirection: "row", padding: 10 },
+  cardImage: { width: 80, height: 80, borderRadius: 10 },
+  cardDetails: { flex: 1, marginLeft: 10 },
+
+  menuItemName: { fontSize: 16, fontWeight: "bold" },
+  menuItemPrice: { fontSize: 14, color: "#008000", marginBottom: 5 },
+  menuItemDescription: { fontSize: 12, color: "#555", marginTop: 5 },
+  ratingContainer: { flexDirection: "row", alignItems: "center" },
+  ratingText: { fontSize: 12, marginLeft: 5, color: "#444" },
+
+  addButton: {
+    backgroundColor: "#ff9800",
+    padding: 8,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 10,
   },
-  price: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#FF5722", // Orange price color
-  },
+  addButtonText: { color: "#fff", fontSize: 14, fontWeight: "bold" },
   quantityContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 8,
+    marginTop: 5,
   },
-  button: {
-    width: 30,
-    height: 30,
-    backgroundColor: "#FF5722", // Orange button
+  qtyButton: {
+    backgroundColor: "#ff9800",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 8,
+    marginHorizontal: 5,
   },
-  buttonText: {
-    fontSize: 20,
-    color: "#FFFFFF",
-  },
-  quantity: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333333",
-  },
-  addToCartButton: {
-    backgroundColor: "#FF5722", // Orange button for adding to cart
-    paddingVertical: 8,
+  qtyText: { color: "#fff", fontSize: 14, fontWeight: "bold" },
+  qtyNumber: { fontSize: 16, fontWeight: "bold" },
+  // **Cart Button**
+  cartButton: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: "#FF5733",
+    padding: 12,
     borderRadius: 5,
     alignItems: "center",
-    marginVertical: 12,
-  },
-  addToCartText: {
-    fontSize: 18,
-    color: "#FFFFFF",
-    fontWeight: "bold",
-  },
-  cartFooter: {
-    paddingVertical: 12,
-    backgroundColor: "#FF5722", // Orange background for footer
-    marginTop: 16,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  totalPriceText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-  },
-  goToCartButton: {
-    marginTop: 8,
-    backgroundColor: "#FFFFFF", // White button to go to cart
-    paddingVertical: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    width: "80%",
-  },
-  goToCartText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#FF5722", // Orange text color
   },
 });
 

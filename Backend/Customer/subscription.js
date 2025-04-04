@@ -1,7 +1,7 @@
 // subscription.js
 const express = require('express');
 const router = express.Router();
-const db = require('../Common/db'); // Import the common database connection
+const db = require('../db/db'); // Import the common database connection
 
 // Create a new subscription
 router.post('/', (req, res) => {

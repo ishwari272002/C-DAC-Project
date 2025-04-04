@@ -1,7 +1,8 @@
 // provider.js
 const express = require('express');
 const router = express.Router();
-const db = require('../Common/db'); // Import the common database connection
+const db = require('../db/db'); // Import the common database connection
+const { API_BASE_URL } = require('../config');
 
 // Create a new provider
 router.post('/register', (req, res) => {
@@ -16,13 +17,21 @@ router.post('/register', (req, res) => {
 });
 
 // Read all providers
-router.get('/list', (req, res) => {
-    const sql = 'SELECT * FROM provider';
+router.get("/list", (req, res) => {
+    const sql = "SELECT provider_id, name, address, phone, email,  image_url, rating,latitude,longitude FROM provider";
+
     db.query(sql, (err, results) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        res.json(results);
+
+        // Append full image URLs
+        const updatedResults = results.map((provider) => ({
+            ...provider,
+            image_url: provider.image_url ? `${API_BASE_URL}/uploads/${provider.image_url}` : `${API_BASE_URL}/uploads/default.jpg`,
+        }));
+
+        res.json(updatedResults);
     });
 });
 
@@ -37,6 +46,18 @@ router.get('/:id', (req, res) => {
             return res.status(404).json({ message: 'Provider not found' });
         }
         res.json(result[0]);
+    });
+});
+
+// Search providers by name
+router.post('/search', (req, res) => {
+    const searchQuery = req.query.name;
+    const sql = 'SELECT * FROM provider WHERE name LIKE ?';
+    db.query(sql, [`%${searchQuery}%`], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(results);
     });
 });
 

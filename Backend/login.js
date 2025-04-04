@@ -1,6 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const db = require('./Common/db'); 
+const db = require('./db/db'); 
 const router = express.Router();
 
 const JWT_SECRET = 'your_jwt_secret_key';
@@ -29,7 +29,7 @@ router.post('/', (req, res) => {
         const user = results[0]; 
         const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
 
-        res.json({ message: 'Login successful', token ,role: user.role});
+        res.json({ message: 'Login successful', token ,role: user.role,id: user.id});
         //avoid sending direct role instead decode jwt for role, use hhh.jsx//
     });
 });

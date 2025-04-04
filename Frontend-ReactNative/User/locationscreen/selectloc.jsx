@@ -60,18 +60,26 @@ const cityRecommendations = [
   "Kiwale",
 ];
 
-export default function LocationScreen({ navigation }) {
+export default function LocationScreen({ route, navigation }) {
   const [location, setLocation] = useState("");
   const [filteredCities, setFilteredCities] = useState([]);
+  
+  // Retrieve the token from previous screen
+  const id = route.params;
 
+  
   const setLoc = () => {
-    console.log("location +:" + location);
-    navigation.navigate("home", { location: location });
+    if (location.trim() !== "") {
+      console.log("location +:" + location);
+      navigation.navigate("BottomTab", { location }); // Pass location as a param
+    } else {
+      alert("Please select a location!");
+    }
   };
 
   const handleUseCurrentLocation = () => {
     // Navigate to MapViewScreen to select a location
-    navigation.navigate("MapViewScreen");
+    navigation.navigate("BottomTab",{id});
   };
 
   const handleSearchChange = (text) => {
@@ -96,6 +104,7 @@ export default function LocationScreen({ navigation }) {
     <View style={styles.container}>
       {/* Title and Subtitle */}
       <View style={styles.topSection}>
+       
         <Text style={styles.title}>Find restaurants near you!</Text>
         <Text style={styles.subtitle}>
           By allowing location access, you can search for restaurants and shops

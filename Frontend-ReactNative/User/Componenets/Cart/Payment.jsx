@@ -6,7 +6,7 @@ const PaymentSuccess = () => {
   const navigation = useNavigation();
 
   const handleGoBack = () => {
-    navigation.navigate("home"); // Navigate to the Home screen or wherever you want
+    navigation.navigate("BottomTab"); // Navigate to the Home screen or wherever you want
   };
 
   return (

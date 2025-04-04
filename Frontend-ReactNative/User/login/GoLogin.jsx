@@ -11,13 +11,16 @@ import {
 } from "react-native";
 import { TextInput, Card } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
-const GoLogin = (props) => {
+const GoLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isHovered, setIsHovered] = useState(false);
   const [error, setError] = useState(null);
   const [secureText, setSecureText] = useState(true);
+  
+  const navigation = useNavigation(); // Use navigation hook
 
   // Function to handle form submission (login)
   const handleLogin = async () => {
@@ -30,7 +33,7 @@ const GoLogin = (props) => {
     setError("");
 
     try {
-      const response = await fetch("http://192.168.196.72:3000/login", {
+      const response = await fetch("http://192.168.24.107:3000/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,18 +47,19 @@ const GoLogin = (props) => {
       const data = await response.json();
 
       if (response.ok) {
-        const { token, role } = data; // Get the token and role from the response
-        await AsyncStorage.setItem("jwtToken", token); // Store the token
+        const { token, role,id } = data; // Get the token and role from the response
+        await AsyncStorage.setItem("jwtToken", token);
+        await AsyncStorage.setItem("id", JSON.stringify(id)); // Ensure it's stored as a string
 
         // Navigate to the appropriate page based on the role
         if (role === "admin") {
-          props.navigation.navigate("admin"); // Replace with actual Admin page
+          navigation.navigate("admin"); // Navigate using useNavigation
         } else if (role === "provider") {
-          props.navigation.navigate("provider"); // Replace with actual Provider page
+          navigation.navigate("provider");
         } else if (role === "customer") {
-          props.navigation.navigate("select-loc"); // Replace with actual Customer page
+          navigation.navigate("select-loc",{id} );
         } else if (role === "agent") {
-          props.navigation.navigate("agent"); // Replace with actual Agent page
+          navigation.navigate("agent");
         }
 
         Alert.alert("Login Successful", "You are now logged in!");
@@ -67,8 +71,9 @@ const GoLogin = (props) => {
       console.error("Error during login:", error);
     }
   };
+
   const handleRegister = () => {
-    props.navigation.navigate("Register");
+    navigation.navigate("Register"); // Navigate without using props
   };
 
   return (
@@ -105,7 +110,7 @@ const GoLogin = (props) => {
             }
           />
 
-          <TouchableOpacity onPress={() => props.navigation.navigate("go-otp")}>
+          <TouchableOpacity onPress={() => navigation.navigate("go-otp")}>
             <Text style={styles.forgotPassword}>Forget password ?</Text>
           </TouchableOpacity>
 
@@ -175,7 +180,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonHover: {
-    backgroundColor: "#4CAF50", // Slightly lighter shade for hover effect
+    backgroundColor: "#4CAF50",
   },
   buttonText: {
     color: "#fff",

@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { TextInput, Button, Card } from "react-native-paper";
 import axios from "axios";
+import API_BASE_URL from "../../config";
 
 export default function RegistrationScreen({ navigation }) {
   const [username, setUsername] = useState("");
@@ -57,8 +58,7 @@ export default function RegistrationScreen({ navigation }) {
       setError("");
       try {
         // Make the API call to register the customer
-        const response = await axios.post(
-          "http://192.168.196.72:3000/customer/register",
+        const response = await axios.post(`${API_BASE_URL}/customer/register`,
           {
             name: username,
             email: email,

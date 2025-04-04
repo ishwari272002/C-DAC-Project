@@ -1,42 +1,45 @@
-// server.js
+const express = require("express");
 const cors = require("cors");
-const express = require('express');
-const bodyParser = require('body-parser');
-const adminRoutes = require('./admin/admin'); // Import admin routes
-const customerRoutes = require('./Customer/customer'); // Import customer routes
-const providerRoutes = require('./Provider/provider'); // Import provider routes
-const agentRoutes = require('./Agent/agent'); // Import agent routes
-const menuRoutes = require('./Provider/menu'); // Import menu routes
-const orderRoutes = require('./Customer/orders'); // Import order routes
-const feedbackRoutes = require('./Common/feedback'); // Import feedback routes
-const itemRoutes = require('./Provider/item'); // Import item routes
-const deliveryRoutes = require('./Common/delivery'); // Import delivery routes
-const subscriptionRoutes = require('./Customer/subscription'); // Import subscription routes
-const paymentRoutes = require('./Common/payment'); // Import payment routes
-const loginRoutes = require('./login');
+const bodyParser = require("body-parser");
+
+const adminRoutes = require("./admin/admin");
+const customerRoutes = require("./Customer/customer");
+const providerRoutes = require("./Provider/provider");
+const agentRoutes = require("./Agent/agent");
+const menuRoutes = require("./Provider/menu");
+const orderRoutes = require("./Customer/orders");
+const feedbackRoutes = require("./Common/feedback");
+const itemRoutes = require("./Provider/item");
+const deliveryRoutes = require("./Common/delivery");
+const subscriptionRoutes = require("./Customer/subscription");
+const paymentRoutes = require("./Common/payment");
+const loginRoutes = require("./login");
+const uploadRoutes = require("./upload"); // Import the upload routes
 
 const app = express();
-const port = 3000; // You can change this to any port you prefer
+const port = 3000;
 
-// Middleware
-app.use(bodyParser.json()); // Parse JSON request bodies
+app.use(bodyParser.json());
 app.use(cors());
 
-// Use the admin, customer, provider, agent, menu, order, feedback, item, delivery, subscription, and payment routes
-app.use('/admin', adminRoutes); // Admin routes will be prefixed with /admin
-app.use('/customer', customerRoutes); // Customer routes will be prefixed with /customer
-app.use('/provider', providerRoutes); // Provider routes will be prefixed with /provider
-app.use('/agent', agentRoutes); // Agent routes will be prefixed with /agent
-app.use('/menu', menuRoutes); // Menu routes will be prefixed with /menu
-app.use('/orders', orderRoutes); // Order routes will be prefixed with /orders
-app.use('/feedback', feedbackRoutes); // Feedback routes will be prefixed with /feedback
-app.use('/item', itemRoutes); // Item routes will be prefixed with /item
-app.use('/delivery', deliveryRoutes); // Delivery routes will be prefixed with /delivery
-app.use('/subscription', subscriptionRoutes); // Subscription routes will be prefixed with /subscription
-app.use('/payment', paymentRoutes); // Payment routes will be prefixed with /payment
-app.use('/login', loginRoutes); 
+// Use all routes
+app.use("/admin", adminRoutes);
+app.use("/customer", customerRoutes);
+app.use("/provider", providerRoutes);
+app.use("/agent", agentRoutes);
+app.use("/menu", menuRoutes);
+app.use("/orders", orderRoutes);
+app.use("/feedback", feedbackRoutes);
+app.use("/item", itemRoutes);
+app.use("/delivery", deliveryRoutes);
+app.use("/subscription", subscriptionRoutes);
+app.use("/payment", paymentRoutes);
+app.use("/login", loginRoutes);
+app.use("/upload", uploadRoutes); // Add upload routes
 
-// Start the server
+// Serve uploaded images
+app.use("/uploads", express.static("uploads"));
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });

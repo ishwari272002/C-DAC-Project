@@ -43,7 +43,7 @@ const ChangePassword = (props) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View contentContainerStyle={styles.container}>
       <Card style={styles.card}>
         <Card.Content>
           <Text style={styles.title}>Change Password</Text>
@@ -95,7 +95,7 @@ const ChangePassword = (props) => {
           </Pressable>
         </Card.Content>
       </Card>
-    </ScrollView>
+    </View>
   );
 };
 

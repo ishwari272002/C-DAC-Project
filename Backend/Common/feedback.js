@@ -1,7 +1,7 @@
 // feedback.js
 const express = require('express');
 const router = express.Router();
-const db = require('./db'); // Import the common database connection
+const db = require('../db/db'); // Import the common database connection
 
 // Create a new feedback entry
 router.post('/', (req, res) => {

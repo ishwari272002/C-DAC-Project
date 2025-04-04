@@ -1,7 +1,7 @@
 // admin.js
 const express = require('express');
 const router = express.Router();
-const db = require('../Common/db'); // Import the common database connection
+const db = require('../db/db'); // Import the common database connection
 
 // Create a new admin
 router.post('/register', (req, res) => {
@@ -41,7 +41,7 @@ router.get('/:id', (req, res) => {
 });
 
 // Update an admin
-router.put('/:id', (req, res) => {
+router.get('/:id', (req, res) => {
     const { username, password } = req.body;
     const sql = 'UPDATE admin SET username = ?, password = ? WHERE admin_id = ?';
     db.query(sql, [username, password, req.params.id], (err, result) => {

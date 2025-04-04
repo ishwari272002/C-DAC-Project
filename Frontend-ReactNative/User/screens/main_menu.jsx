@@ -4,7 +4,7 @@ import { Card, IconButton } from "react-native-paper";
 import Icon from "react-native-vector-icons/Ionicons";
 
 function MainPage({ navigation, route }) {
-  const { location } = route.params;
+  
 
   return (
     <View style={styles.container}>
@@ -14,7 +14,7 @@ function MainPage({ navigation, route }) {
           <View style={styles.loc}>
             <Text>Delivery In 30-40 minutes</Text>
             <TouchableOpacity onPress={() => navigation.navigate("select-loc")}>
-              <Text style={styles.loc}>{location}</Text>
+              <Text style={styles.loc}>location</Text>
               <Icon name="location" size={20} color="#000" />
             </TouchableOpacity>
           </View>

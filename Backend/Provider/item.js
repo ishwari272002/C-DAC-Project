@@ -1,23 +1,24 @@
 // item.js
 const express = require('express');
 const router = express.Router();
-const db = require('../Common/db'); // Import the common database connection
+const db = require('../db/db'); // Import the common database connection
 
-// Create a new item
+// ✅ Add an item to an order
 router.post('/', (req, res) => {
-    const { order_id, menu_id, quantity, price } = req.body;
-    const sql = 'INSERT INTO item (order_id, menu_id, quantity, price) VALUES (?, ?, ?, ?)';
-    db.query(sql, [order_id, menu_id, quantity, price], (err, result) => {
+    const { order_id, item_name, quantity } = req.body;
+    const sql = 'INSERT INTO order_items (order_id, item_name, quantity) VALUES (?, ?, ?)';
+    
+    db.query(sql, [order_id, item_name, quantity], (err, result) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        res.status(201).json({ item_id: result.insertId, order_id, menu_id });
+        res.status(201).json({ message: 'Item added successfully', item_id: result.insertId });
     });
 });
 
-// Read all items
+// ✅ Get all items
 router.get('/', (req, res) => {
-    const sql = 'SELECT * FROM item';
+    const sql = 'SELECT * FROM order_items';
     db.query(sql, (err, results) => {
         if (err) {
             return res.status(500).json({ error: err.message });
